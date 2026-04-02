@@ -36,6 +36,12 @@ Detailed evidence and edge cases:
 - Treat timing assumptions as behavioral contracts during refactors.
 - Details: [Clipboard Paste Timing Constraint](../technical/undocumented-behaviors.md#clipboard-paste-timing-constraint)
 
+## Text hyperlinks (canvas)
+
+- Markdown `[label](url)` is parsed on submit into stored `text = label` plus `element.link` (`parseMarkdownLink` in `@excalidraw/common`, wiring in `App.tsx`).
+- Canvas/SVG styling and URL resolution go through `packages/element/src/textHyperlink.ts` (`getTextHyperlinkRenderState`, `getTextHyperlinkUrl`).
+- When the text element is **not** selected, `isPointHittingLink` treats the text bbox as the link target for pointer hits (`packages/excalidraw/components/hyperlink/helpers.ts`). Rationale: [`decisionLog.md`](decisionLog.md) (2026-04).
+
 ## Related docs
 
 - Architecture details: [`../technical/architecture.md`](../technical/architecture.md)

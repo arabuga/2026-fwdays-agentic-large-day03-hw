@@ -2,8 +2,9 @@
 
 ## Current status
 
-- **Last reviewed:** 2026-03-28
-- **Text hyperlinks (issue #11024 / PR #11049 pattern):** If a text element’s entire content is a single markdown link `[label](url)` on submit, the visible text becomes `label` and `element.link` is set (sanitized via `normalizeLink`). Inline links inside prose are not auto-parsed. See [`packages/excalidraw/utils/markdownLink.ts`](../../packages/excalidraw/utils/markdownLink.ts).
+- **Last reviewed:** 2026-04-03
+- **Text hyperlinks (issue #11024):** On submit, a single `[label](url)` in the text field becomes stored `label` + `element.link` (via `parseMarkdownLink` in [`packages/common/src/markdownLink.ts`](../../packages/common/src/markdownLink.ts), re-exported from `packages/excalidraw/utils/markdownLink.ts`). Canvas/SVG hyperlink styling and bbox hit-test when not selected: [`systemPatterns.md`](systemPatterns.md) + OpenSpec `html-hyperlinks`.
+- **Branch sync:** `master` rebased onto `koldovsky/master` (2026-04); run `yarn test:typecheck`, `yarn build`, and `yarn test` locally after pull — automated agent shell may not have Node/Yarn on `PATH`.
 - **Memory Bank:** roles clarified in [`README.md`](README.md); duplication reduced (`techContext.md` owns versions and commands).
 - **Behavior docs:** snapshot semantics are now split by role:
   - operational summary in [`systemPatterns.md`](systemPatterns.md)
