@@ -1,19 +1,21 @@
 # Pull request description (Day 3) — copy into GitHub
 
+**Рекомендований заголовок PR (один рядок, без `##`):**  
+`Day 3 SDD: #11024 markdown text hyperlinks — Vitalii Yurkov`
+
 Скопіюйте вміст нижче в опис PR (base: `koldovsky/2026-fwdays-agentic-large-day03-hw` → `master`, head: ваш форк).
 
 ---
 
 ## Day 3: SDD Assignment
 
-**Учасник:** Vitalii Yurkov (arabuga)
+**Учасник:** Віталій Юрков
 
 ### Обраний SDD-підхід
 
-- [x] **Simple Markdown** — `docs/specs/<issue-number>.md`
-- [x] **OpenSpec** — `openspec/changes/html-hyperlinks/`
+**Основний:** **OpenSpec** — `openspec/changes/html-hyperlinks/` (сценарії поведінки, delta spec, tasks).
 
-**Обґрунтування вибору:** Для issue #11024 зафіксовано вимоги в `docs/specs/11024.md`; поведінка сценаріїв (парсинг `[label](url)`, безпека URL, рендер) формалізована в OpenSpec (`openspec/changes/html-hyperlinks/` + `openspec/specs/text-rendering/spec.md`), щоб було зручно звіряти реалізацію з SHALL/GIVEN-WHEN-THEN.
+**Додатковий артефакт (не окремий підхід):** коротка markdown-спека issue — `docs/specs/11024.md` (Goal, Changes Required, шляхи файлів), щоб швидко звірятися з `.coderabbit.yaml` для `docs/specs/*.md`.
 
 ### Issue
 
@@ -22,30 +24,27 @@
 
 ### Зроблено
 
-- Парсинг `[label](url)` у `@excalidraw/common` (`parseMarkdownLink`) з відхиленням `javascript:`, `data:` тощо; тести в `packages/common/tests/markdownLink.test.ts`.
-- Після сабміту тексту: збереження **видимого** `label` у `element.text`, URL у `element.link` (і toast про виявлене посилання) у `App.tsx`.
-- Canvas: колір посилання та підкреслення по рядках для тексту з вирішеним URL (`renderElement.ts`, `textHyperlink.ts`).
-- Hit-test: для тексту з URL, коли елемент **не** вибраний, попадання в **bounding box** тексту відкриває посилання (`hyperlink/helpers.ts`).
-- SVG експорт: `fill`, `underline`, зовнішній `<a>` де потрібно (`staticSvgScene.ts`).
+- Парсинг `[label](url)` у `@excalidraw/common` (`parseMarkdownLink`) з відхиленням небезпечних схем; тести в `packages/common/tests/markdownLink.test.ts`.
+- Після сабміту тексту: збереження **видимого** `label` у `element.text`, URL у `element.link` (toast у `App.tsx`).
+- Canvas / SVG / hit-test — як у комітах `feat(text): …` (див. diff).
 
 ### Self-Review Checklist
 
-- [x] SDD-підхід обраний та обґрунтований (Markdown / OpenSpec / BMAD)
-- [x] Реалізація відповідає специфікації
-- [x] Дотримані конвенції проєкту (з правил)
-- [x] Edge cases оброблені (невалідні URL, подвійні посилання в рядку — перше виграє в парсері)
-- [x] Blast radius прийнятний (мінімум непов'язаних змін)
-- [x] Існуючі тести проходять (потрібно локально: `yarn test` / `yarn test:typecheck`)
-- [x] Нові тести додані (unit для `parseMarkdownLink`)
-- [x] Немає security concerns (відхилення небезпечних схем URL)
-- [x] i18n правильно оброблений (toast ключ у `en.json`)
-- [x] Немає hardcoded values (колір посилання винесено в константу `TEXT_HYPERLINK_COLOR`)
-- [x] Інший розробник зрозуміє цей код без пояснень
+- [x] SDD: основний артефакт — OpenSpec; `docs/specs/11024.md` узгоджений з реальними шляхами в монорепо
+- [x] Реалізація відповідає оновленим спекам (у т.ч. trade-off вибору vs bbox link)
+- [x] Дотримані конвенції проєкту
+- [x] Edge cases для парсера покриті unit-тестами
+- [ ] **Blast radius:** у PR є великий шар workshop-доків (`docs/**`, memory bank тощо) — окремо від фічі; ментору видно в diff; за потреби можна винести фічу в окрему гілку без scaffold (обговорення)
+- [ ] `yarn test:typecheck` / `yarn build` / `yarn test` — прогнати локально або підтвердити зелений CI
+- [x] Нові unit-тести: `parseMarkdownLink`
+- [x] Security: відхилення небезпечних URL у парсері + `normalizeLink`
+- [x] i18n: toast у `en.json`
+- [x] Колір посилання: одна константа `TEXT_HYPERLINK_COLOR` (у т.ч. data-URI іконок у `helpers.ts`)
 
 ### Нотатки
 
-Найскладніше — узгодити вимірювання/рендер тексту з `link` і тимчасовим markdown у рядку до сабміту (`getPlainTextForMeasurement`, `getTextHyperlinkRenderState`). SDD допоміг тримати в один рядок baseline issue, OpenSpec change і чеклист задач.
+Найскладніше — `getPlainTextForMeasurement` / `getTextHyperlinkRenderState` для стану до і після сабміту. Після review: виправлено `docs/specs/11024.md` (шляхи, Changes Required, Non-goals), mojibake у `decisionLog.md`, дубль hex у SVG іконок.
 
 ---
 
-**Локальна перевірка:** у середовищі CI/агента переконайтеся, що `yarn test:typecheck`, `yarn build` і за потреби `yarn test` проходять на вашій машині.
+**Локальна перевірка:** `yarn test:typecheck`, `yarn build`, `yarn test`.

@@ -5,37 +5,45 @@
 
 Нижче лише **нові або змінені** вимоги. Усе, що не згадано, залишається як у baseline.
 
-## ADDED — Canvas text з вирішеним URL посилання
+## ADDED Requirements
 
 Контекст: після сабміту з `[label](url)` у сцені зберігаються `element.text === label` і truthy `element.link`. До сабміту стилізація можлива, якщо весь видимий вміст — один валідний markdown-посилання (див. baseline «Markdown Link Detection»).
 
 ### REQ-TR-LINK-001 — Колір посилання
 
-Якщо `isTextElement(element)` і для нього **вирішено** URL гіперпосилання (`getTextHyperlinkUrl` / еквівалент: `element.link` або одиночний валідний `[label](url)` у `element.text`), колір заливки на canvas **має** відрізнятися від звичайного `strokeColor`: **погоджений колір посилання** (узгоджений з UI hyperlink), з **коректною обробкою темної теми**.
+- **GIVEN** `isTextElement(element)` і вирішений URL гіперпосилання (`getTextHyperlinkUrl`: `element.link` або одиночний валідний `[label](url)` у `element.text`)
+- **WHEN** текст малюється на canvas
+- **THEN** колір заливки MUST відрізнятися від `strokeColor`; MUST застосовуватися той самий dark-mode фільтр до кольору посилання, що й для іншого hyperlink UI
 
 ### REQ-TR-LINK-002 — Підкреслення
 
-У тому самому випадку кожен **непорожній** рядок відображеного тексту (після нормалізації рядків) **має** мати **візуальне підкреслення** під базовою лінією рядка. Порожні рядки не підкреслюються.
+- **GIVEN** той самий випадок, що в REQ-TR-LINK-001
+- **WHEN** кожен непорожній рядок рендериться
+- **THEN** під базовою лінією рядка MUST бути візуальне підкреслення; порожні рядки MUST NOT підкреслюватися
 
 ### REQ-TR-LINK-003 — Без посилання
 
-Якщо URL **не** вирішено, рендер тексту **має** збігатися з baseline (колір `strokeColor`, **без** додаткового підкреслення з цієї фічі).
+- **GIVEN** URL гіперпосилання не вирішено
+- **WHEN** текст рендериться
+- **THEN** вигляд MUST збігатися з baseline (`strokeColor`, без підкреслення з цієї фічі)
 
-## ADDED — SVG text
+### REQ-TR-LINK-004 — SVG експорт
 
-### REQ-TR-LINK-004 — Семантика вигляду в експорті
+- **GIVEN** текстовий елемент з вирішеним URL
+- **WHEN** експортується SVG
+- **THEN** підпис MUST мати вигляд гіперпосилання (`fill` як у REQ-TR-LINK-001, `text-decoration: underline` на `<text>`); зовнішній або внутрішній `<a>` MUST уникати дублювання, якщо `element.link` вже дає обгортку
 
-Для текстових елементів з вирішеним URL SVG **має** відображати підпис як гіперпосилання за виглядом: **fill** як у REQ-TR-LINK-001, **`text-decoration: underline`** на `<text>`; зовнішній або внутрішній `<a>` — згідно з наявною схемою експорту (якщо вже є обгортка `<a>` від `element.link`, дублювання не потрібне).
+### REQ-TR-LINK-005 — Hit-test по тексту
 
-## ADDED — Pointer / hit-test
+- **GIVEN** `isTextElement` з вирішеним URL і елемент не вибраний
+- **WHEN** pointer у межах bounding box тексту
+- **THEN** hit MUST трактуватися як посилання для відкриття URL через `normalizeLink` / `onLinkOpen` / `handleElementLinkClick`
 
-### REQ-TR-LINK-005 — Клік по тексту посилання
+### REQ-TR-LINK-006 — Не-текст та інші гілки
 
-Для `isTextElement(element)` з вирішеним URL, коли елемент **не** у вибраному стані, точка всередині **bounding box** тексту **має** вважатися попаданням у посилання для відкриття URL (узгоджено з `normalizeLink`, `onLinkOpen`, існуючим `handleElementLinkClick`).
-
-### REQ-TR-LINK-006 — Інші елементи та мобільні
-
-Для **не-текстових** елементів з `link` збережіть baseline: іконка посилання та/або view mode bbox — як до зміни. Для **тексту** з URL hit-test по bbox застосовується незалежно від form factor (параметр `isMobile` у `isPointHittingLink` обробляє інші гілки).
+- **GIVEN** не-текстовий елемент з `link`
+- **WHEN** обчислюється hit-test
+- **THEN** MUST зберігатися baseline (іконка / view mode); для тексту bbox MUST застосовуватися незалежно від `isMobile` у цій гілці
 
 ## Non-goals (без змін)
 
